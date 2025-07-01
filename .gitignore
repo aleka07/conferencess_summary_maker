@@ -1,0 +1,16 @@
+# Файлы виртуального окружения
+venv/
+.env
+
+# Папки с данными и результатами
+input/
+audio-from-input/
+chunks/
+not_realated/
+raw_text/
+summaries/
+
+# Кэш Python и системные файлы
+__pycache__/
+*.pyc
+.vscode/
