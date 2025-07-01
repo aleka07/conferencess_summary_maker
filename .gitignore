@@ -14,3 +14,5 @@ summaries/
 __pycache__/
 *.pyc
 .vscode/
+
+master_script.py
