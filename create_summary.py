@@ -2,6 +2,9 @@ import os
 import shutil
 from google import genai
 from google.genai import types
+import os
+from dotenv import load_dotenv
+load_dotenv()   
 
 # --- НАСТРОЙКИ ---
 API_KEY = os.environ.get("GEMINI_API_KEY")  # <-- ЗАМЕНИТЕ ВАШИМ КЛЮЧОМ
