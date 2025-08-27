@@ -1,63 +1,159 @@
-# Resume Maker from Video
+# Audio Processing & Transcription Pipeline
 
-This project extracts audio from a video, transcribes it, and creates a summary. It's a pipeline of Python scripts that work together to process a video file and generate a text summary.
+Automated pipeline for converting video recordings into text transcripts and AI summaries. Built this for processing meeting recordings and interview sessions.
 
-## Directory Structure
+## Features
 
-- `input/`: Place your input video files in this directory.
-- `audio-from-input/`: Stores the extracted audio files from the input videos.
-- `chunks/`: Stores the audio chunks created from the extracted audio.
-- `raw_text/`: Stores the raw text transcripts from the audio chunks.
-- `summaries/`: Stores the final summaries of the transcripts.
-- `not_realated/`: This directory seems unrelated to the main workflow.
-- `venv/`: Python virtual environment.
+- Extract audio from video files (webm, mp4, etc.)
+- Split long audio files into chunks for better processing
+- Local transcription using Whisper large-v3 model
+- Merge transcripts with timestamp information  
+- Generate summaries using OpenRouter API
 
-## Workflow
+## 📁 Project Structure
 
-The process is divided into several steps, each handled by a specific Python script. You need to run them in the following order:
+```
+clean-workflow/
+├── 1-extract_audio.py          # Video → Audio conversion
+├── 2-split_audio.py             # Audio chunking with overlap
+├── 3-transcribe_local_batch.py  # Whisper-based transcription
+├── 4-merge_transcripts.py       # Transcript consolidation
+├── 5-create_summary_openrouter.py # AI summary generation
+├── input/                       # Input video files (.webm, .mp4, etc.)
+├── audio-from-input/           # Extracted audio files (.mp3)
+├── chunks/                     # Audio segments by project
+│   └── [project-name]/         # Individual audio chunks
+├── raw_text/                   # Transcription results
+│   └── [project-name]/         # Text files with timestamps
+│       ├── [chunk]_part001.txt
+│       ├── [chunk]_part002.txt
+│       └── _full_transcript.txt
+└── summaries/                  # Final AI summaries
+    └── [project-name]/
+        └── _summary.txt
+```
 
-### 1. Extract Audio from Video
+## Tech Stack
 
-This step extracts the audio from a video file.
+- **FFmpeg** for audio processing
+- **Whisper Large-v3** via transformers library
+- **PyTorch** with CUDA acceleration
+- **OpenRouter API** for summary generation
+- **Python 3.8+**
 
-**Script:** `extract_audio.py`
-**Input:** A video file in the `input/` directory.
-**Output:** An audio file in the `audio-from-input/` directory.
+## Setup
 
-### 2. Split Audio into Chunks
+### Requirements
+- Python 3.8+
+- FFmpeg (for audio processing)
+- OpenRouter API key
+- CUDA GPU (optional, speeds up transcription)
 
-This step splits the audio file into smaller chunks.
+### Installation
+```bash
+# Install dependencies
+pip install -r clean-workflow/requirements.txt
 
-**Script:** `split_audio.py`
-**Input:** An audio file from the `audio-from-input/` directory.
-**Output:** Audio chunks in a subdirectory inside the `chunks/` directory.
+# For CUDA support (recommended)
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
-### 3. Transcribe Audio Chunks
+# Install FFmpeg
+# Ubuntu: sudo apt install ffmpeg
+# macOS: brew install ffmpeg
+# Windows: Download from ffmpeg.org
+```
 
-This step transcribes the audio chunks into text.
+### Configuration
+Copy `.env.example` to `.env` and add your OpenRouter API key:
+```bash
+cp clean-workflow/.env.example clean-workflow/.env
+# Edit .env file with your API key
+```
 
-**Script:** `transcribe_chunks_new.py`
-**Input:** Audio chunks from a subdirectory in the `chunks/` directory.
-**Output:** Raw text files in a subdirectory inside the `raw_text/` directory.
+## 📋 Usage
 
-### 4. Merge Transcripts
+The pipeline consists of 5 sequential steps. Each script provides an interactive menu for file selection:
 
-This step merges the individual transcripts into a single file.
+### Step 1: Extract Audio
+```bash
+cd clean-workflow
+python 1-extract_audio.py
+```
+Extracts high-quality MP3 audio from video files in the `input/` directory.
 
-**Script:** `merge_transcripts.py`
-**Input:** Raw text files from a subdirectory in the `raw_text/` directory.
-**Output:** A merged transcript file.
+### Step 2: Split Audio
+```bash
+python 2-split_audio.py
+```
+Splits audio files into 10-minute chunks with 10-second overlap for seamless transcription.
 
-### 5. Create Summary
+### Step 3: Transcribe Audio
+```bash
+python 3-transcribe_local_batch.py
+```
+Uses local Whisper model to transcribe audio chunks with timestamp information.
 
-This step creates a summary from the merged transcript.
+### Step 4: Merge Transcripts
+```bash
+python 4-merge_transcripts.py
+```
+Combines individual transcript files into a single document with metadata.
 
-**Script:** `create_summary.py`
-**Input:** A merged transcript file.
-**Output:** A summary file in a subdirectory inside the `summaries/` directory.
+### Step 5: Generate Summary
+```bash
+python 5-create_summary_openrouter.py
+```
+Creates a professional summary using AI, formatted with key takeaways and action items.
 
-## Dependencies
+## 🏗️ Pipeline Architecture
 
-To run these scripts, you will need to install the required Python libraries. You can find the necessary libraries by looking at the `import` statements at the beginning of each Python script.
+```mermaid
+graph TB
+    A[Video Files] --> B[1-extract_audio.py]
+    B --> C[Audio Files .mp3]
+    C --> D[2-split_audio.py]
+    D --> E[Audio Chunks]
+    E --> F[3-transcribe_local_batch.py]
+    F --> G[Text Transcripts]
+    G --> H[4-merge_transcripts.py]
+    H --> I[Full Transcript]
+    I --> J[5-create_summary_openrouter.py]
+    J --> K[AI Summary]
+    
+    style A fill:#e1f5fe
+    style K fill:#f3e5f5
+    style F fill:#fff3e0
+```
 
-**Note:** This project seems to be designed to process one video at a time. The subdirectories created in `chunks/`, `raw_text/`, and `summaries/` are likely named after the input file to keep the data organized.
+## Notes
+
+- Each script can be run independently for debugging
+- Scripts detect existing outputs and ask before overwriting
+- Interface is in Russian since I mainly process Russian meetings
+- GPU acceleration makes transcription much faster
+- File organization keeps everything structured by project name
+
+## 📊 Example Output
+
+The pipeline generates professional summaries like:
+
+```markdown
+### Meeting Summary: project-review-2024
+#### 🔹 Key Discussion Topics:
+- Q4 performance review and metrics analysis
+- Resource allocation for upcoming initiatives
+#### 🎯 Main Conclusions:
+- Revenue targets exceeded by 15%
+- Team capacity planning needs adjustment
+#### ✅ Decisions Made:
+- Approve budget increase for development team
+- Implement new project tracking system
+```
+
+## TODO
+
+- [ ] Single script to run entire pipeline
+- [ ] Better progress indicators  
+- [ ] Docker setup
+- [ ] Web interface
+- [ ] Support more AI models

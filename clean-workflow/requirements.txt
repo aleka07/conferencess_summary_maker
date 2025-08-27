@@ -1,0 +1,26 @@
+# Audio Processing & Transcription Pipeline Requirements
+
+# Core PyTorch and ML dependencies
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# Transformers and speech processing
+transformers>=4.35.0
+accelerate>=0.24.0
+
+# API and environment management
+openai>=1.0.0
+python-dotenv>=1.0.0
+
+# User interface improvements
+tqdm>=4.60.0
+
+# Optional: For better performance and CUDA support
+# Install PyTorch with CUDA using:
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# System Requirements:
+# - Python 3.8+
+# - FFmpeg (installed separately)
+# - CUDA-capable GPU (optional, for faster transcription)
